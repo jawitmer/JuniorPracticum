@@ -1,7 +1,7 @@
 ---
 title: "Test RMarkdown file"
 author: "Jeff"
-date: "9/26/2020"
+date: "9/29/2020"
 output: html_document
 ---
 
@@ -18,6 +18,8 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r cars}
 summary(cars)
 mean(cars$speed)
+median(cars$speed) 
+sd(cars$speed)
 ```
 
 ## Including Plots
