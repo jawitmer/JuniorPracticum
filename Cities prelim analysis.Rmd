@@ -1,0 +1,69 @@
+---
+title: "Cities prelim analysis"
+author: "Jeff Witmer"
+date: "10/27/2020"
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 6
+  html_notebook: default
+  word_document:
+    fig_height: 4
+    fig_width: 6
+  pdf_document:
+    fig_height: 5
+    fig_width: 7
+---
+
+We now have data entered for 32 cities on each of several variables. I want to start playing with the data.
+
+
+```{r setup, message=FALSE,  warning=FALSE}
+## Libraries to include
+library(tidyverse)
+## Load the data
+library(readxl)
+NewCities <- read_excel("New Cities Database copy late reduced 10-27-20.xlsx")
+
+```
+
+Look at the structure of the datafile.
+```{r}
+str(NewCities)
+```
+
+For some reason some of the variables are chr, but they should be num.
+```{r}
+#NewCities$RatioBlackWhite <- as.numeric(as.character(NewCities$RatioBlackWhite))
+NewCities$DiffBlackMinusWhite <- as.numeric(NewCities$DiffBlackMinusWhite)
+NewCities$RatioBlackWhite <- as.numeric(NewCities$RatioBlackWhite)
+NewCities$implicit_score_mean <- as.numeric(NewCities$implicit_score_mean)
+str(NewCities)
+```
+
+
+
+The primary variables are DiffBlackMinusWhite, RatioBlackWhite, animus_score, and implicit_score_mean. 
+```{r}
+Cities <- NewCities %>% select(c(City, year, DiffBlackMinusWhite, RatioBlackWhite, animus_score, implicit_score_mean))
+dim(Cities)
+```
+
+```{r}
+head(Cities)
+```
+
+
+A scatterplot matrix.
+```{r}
+plot(Cities[2:6])
+```
+
+There are a few extreme points for RatioBlackWhite. They are for Oakland:
+```{r}
+Cities[order(Cities$RatioBlackWhite, decreasing = TRUE),]
+```
+
+
+
+
