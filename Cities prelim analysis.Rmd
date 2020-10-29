@@ -81,4 +81,5 @@ Consider Year also.
 ```{r}
 summary(mod1yr <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean + year, data = Cities))
 summary(mod2yr <- lm(RatioBlackWhite ~ implicit_score_mean + year, data = Cities))
+summary(modyYearOnly <- lm(RatioBlackWhite ~ year, data = Cities))
 ```
