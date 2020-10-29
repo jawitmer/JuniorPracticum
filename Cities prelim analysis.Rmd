@@ -64,6 +64,21 @@ There are a few extreme points for RatioBlackWhite. They are for Oakland:
 Cities[order(Cities$RatioBlackWhite, decreasing = TRUE),]
 ```
 
+Let's look at RatioBlackWhite as a response to a couple of predictors.
+```{r}
+plot(RatioBlackWhite ~ animus_score, data = Cities)
+plot(RatioBlackWhite ~ implicit_score_mean, data = Cities)
+plot(RatioBlackWhite ~ year, data = Cities)
+#plot(animus_score ~ implicit_score_mean, data = Cities)
+```
 
+```{r}
+summary(mod1 <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean, data = Cities))
+summary(mod2 <- lm(RatioBlackWhite ~ implicit_score_mean, data = Cities))
+```
 
-
+Consider Year also.
+```{r}
+summary(mod1yr <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean + year, data = Cities))
+summary(mod2yr <- lm(RatioBlackWhite ~ implicit_score_mean + year, data = Cities))
+```
