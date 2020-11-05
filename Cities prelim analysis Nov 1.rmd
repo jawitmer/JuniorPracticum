@@ -1,0 +1,103 @@
+---
+title: "Cities prelim analysis"
+author: "Jeff Witmer"
+date: "11/1/2020"
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 6
+  html_notebook: default
+  word_document:
+    fig_height: 4
+    fig_width: 6
+  pdf_document:
+    fig_height: 5
+    fig_width: 7
+---
+
+We now have data entered for 32 cities on each of several variables. This now includes police demographics.
+
+
+```{r setup, message=FALSE,  warning=FALSE}
+## Libraries to include
+library(tidyverse)
+library(mosaic)
+## Load the data
+library(readxl)
+#NewCities <- read_excel("New Cities Database copy late reduced 10-27-20.xlsx")
+#NewCities <- read_excel("New Cities Database copy 10-28-20.xlsx")
+NewCities <- read_excel("New Cities Database copy noNAs 11-1-20.xlsx")
+```
+
+Look at the structure of the datafile.
+```{r}
+str(NewCities)
+```
+
+
+The primary variables are DiffBlackMinusWhite, RatioBlackWhite, animus_score, and implicit_score_mean. 
+```{r}
+Cities <- NewCities %>% select(c(City, year, DiffBlackMinusWhite, RatioBlackWhite, animus_score, implicit_score_mean, Region))
+dim(Cities)
+```
+
+```{r}
+head(Cities)
+```
+
+
+A scatterplot matrix.
+```{r}
+plot(Cities[2:6])
+```
+
+There are a few high points for RatioBlackWhite. They are for California:
+```{r}
+Cities[order(Cities$RatioBlackWhite, decreasing = TRUE),]
+```
+
+ It will be helpful to have R know that Region is a factor.
+```{r}
+NewCities$Region <- as.factor(NewCities$Region)
+str(NewCities)
+```
+
+
+Let's look at RatioBlackWhite as a response to a couple of predictors. It seems that I need to use as.factor() despite resetting Region as a factor above.
+```{r}
+plot(RatioBlackWhite ~ animus_score, col = as.factor(Region), data = Cities)
+plot(RatioBlackWhite ~ animus_score, data = Cities)
+plot(RatioBlackWhite ~ implicit_score_mean, col = as.factor(Region), data = Cities)
+plot(RatioBlackWhite ~ year, col = as.factor(Region), data = Cities)
+plot(animus_score ~ implicit_score_mean, col = as.factor(Region), data = Cities)
+```
+
+The mPlot() command is useful for exploring the data. After using it, I came up with this plot, for example:
+```{r}
+gf_point(implicit_score_mean ~ RatioBlackWhite, data = Cities, color = ~ Region) %>% 
+gf_theme(legend.position = "right") %>% 
+gf_labs(title = "", caption = "")
+```
+
+Here is a plot that shows (in log scale) that when WhitePoliceShare is below 60% RatioBlackWhite is high. (Recall that RatioBlackWhite is the relative probability of a Black driver being stopped to that of a White driver being stopped, and is our main response variable of interest.)
+```{r}
+gf_point(RatioBlackWhite ~ WhitePoliceShare, data = NewCities, color = ~ implicit_score_mean) %>%
+gf_smooth() %>%
+gf_refine(scale_y_log10()) %>% 
+gf_theme(legend.position = "top") %>% 
+gf_labs(title = "", caption = "")
+```
+
+
+
+```{r}
+summary(mod1 <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean, data = Cities))
+summary(mod2 <- lm(RatioBlackWhite ~ implicit_score_mean, data = Cities))
+```
+
+Consider Year also.
+```{r}
+summary(mod1yr <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean + year, data = Cities))
+summary(mod2yr <- lm(RatioBlackWhite ~ implicit_score_mean + year, data = Cities))
+summary(modyYearOnly <- lm(RatioBlackWhite ~ year, data = Cities))
+```
