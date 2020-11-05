@@ -89,6 +89,23 @@ gf_labs(title = "", caption = "")
 ```
 
 
+Another graph, not about stops but about implicit mean score and police force demographics.
+```{r}
+gf_point(WhitePoliceShare ~ implicit_score_mean, data = NewCities, color = ~ animus_score) %>%
+gf_lm() %>% 
+gf_theme(legend.position = "top") %>% 
+gf_labs(title = "", caption = "")
+```
+
+A similar graph, not about stops but about animus score and police force demographics.
+```{r}
+gf_point(WhitePoliceShare ~ animus_score, data = NewCities, color = ~ implicit_score_mean) %>%
+gf_lm() %>% 
+gf_theme(legend.position = "top") %>% 
+gf_labs(title = "", caption = "")
+```
+
+
 
 ```{r}
 summary(mod1 <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean, data = Cities))

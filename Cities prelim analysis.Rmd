@@ -1,7 +1,7 @@
 ---
 title: "Cities prelim analysis"
 author: "Jeff Witmer"
-date: "10/28/2020"
+date: "10/29/2020"
 output:
   html_document:
     fig_height: 4
@@ -21,10 +21,12 @@ We now have data entered for 32 cities on each of several variables. I want to s
 ```{r setup, message=FALSE,  warning=FALSE}
 ## Libraries to include
 library(tidyverse)
+library(mosaic)
 ## Load the data
 library(readxl)
-NewCities <- read_excel("New Cities Database copy late reduced 10-27-20.xlsx")
-
+#NewCities <- read_excel("New Cities Database copy late reduced 10-27-20.xlsx")
+#NewCities <- read_excel("New Cities Database copy 10-28-20.xlsx")
+NewCities <- read_excel("New Cities Database copy 10-29-20.xlsx")
 ```
 
 Look at the structure of the datafile.
@@ -45,7 +47,7 @@ str(NewCities)
 
 The primary variables are DiffBlackMinusWhite, RatioBlackWhite, animus_score, and implicit_score_mean. 
 ```{r}
-Cities <- NewCities %>% select(c(City, year, DiffBlackMinusWhite, RatioBlackWhite, animus_score, implicit_score_mean))
+Cities <- NewCities %>% select(c(City, year, DiffBlackMinusWhite, RatioBlackWhite, animus_score, implicit_score_mean, Region))
 dim(Cities)
 ```
 
@@ -66,11 +68,21 @@ Cities[order(Cities$RatioBlackWhite, decreasing = TRUE),]
 
 Let's look at RatioBlackWhite as a response to a couple of predictors.
 ```{r}
+plot(RatioBlackWhite ~ animus_score, col = as.factor(Region), data = Cities)
 plot(RatioBlackWhite ~ animus_score, data = Cities)
-plot(RatioBlackWhite ~ implicit_score_mean, data = Cities)
-plot(RatioBlackWhite ~ year, data = Cities)
-#plot(animus_score ~ implicit_score_mean, data = Cities)
+plot(RatioBlackWhite ~ implicit_score_mean, col = as.factor(Region), data = Cities)
+plot(RatioBlackWhite ~ year, col = as.factor(Region), data = Cities)
+plot(animus_score ~ implicit_score_mean, col = as.factor(Region), data = Cities)
 ```
+
+The mPlot() command is useful for exploring the data. After using it, I came up with this plot, for example:
+```{r}
+gf_point(implicit_score_mean ~ RatioBlackWhite, data = Cities, color = ~ Region) %>% 
+gf_theme(legend.position = "right") %>% 
+gf_labs(title = "", caption = "")
+```
+
+
 
 ```{r}
 summary(mod1 <- lm(RatioBlackWhite ~ animus_score + implicit_score_mean, data = Cities))
