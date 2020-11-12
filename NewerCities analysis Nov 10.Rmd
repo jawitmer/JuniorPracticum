@@ -1,0 +1,56 @@
+---
+title: "Analysis using NewerCities data"
+author: "Jeff Witmer"
+date: "11/10/2020"
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 6
+  html_notebook: default
+  word_document:
+    fig_height: 4
+    fig_width: 6
+  pdf_document:
+    fig_height: 5
+    fig_width: 7
+---
+
+We have data entered for 31 cities (we are leaving out Idaho Falls) on each of several variables. The file NewerCitiesDatabase contains all of the variables.
+
+```{r setup, message=FALSE,  warning=FALSE}
+## Libraries to include
+library(tidyverse)
+library(mosaic)
+## Load the data
+NewCities <- read.csv("~/JuniorPracticumGitHub/NewerCitiesDatabase.csv")
+```
+
+Look at the structure of the datafile.
+```{r}
+str(NewCities)
+```
+
+The mplot() command is useful; but first I should define some city demographic variables. 
+And maybe I should filter on year, so that each city shows up only once, in a preliminary analysis.
+How should we measure whiteness of a police force relative to a city?
+```{r}
+NewCities <- NewCities %>% mutate(WhPoliceExcess = WhitePoliceShare/WhitePopShare)
+Only2015 <- NewCities %>% filter(year == 2015)
+```
+
+
+Look for  high points for WhPoliceExcess 
+```{r}
+Only2015[order(Only2015$WhPoliceExcess, decreasing = TRUE),]
+```
+
+
+From mplot() I got this graph, showing that when the Black population share is low, the ratio of Black to White probability of being stopped is high.
+```{r}
+gf_point(RatioBlackWhite ~ BlackPopShare, data = NewCities) %>%
+gf_smooth() %>%
+gf_refine(scale_y_log10()) %>% 
+gf_labs(title = "", caption = "")
+```
+
+
