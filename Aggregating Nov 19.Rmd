@@ -1,0 +1,87 @@
+---
+title: "More Analysis Nov 18"
+author: "Jeff Witmer"
+date: "11/18/2020"
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 6
+  html_notebook: default
+  word_document:
+    fig_height: 4
+    fig_width: 6
+  pdf_document:
+    fig_height: 5
+    fig_width: 7
+---
+
+We have data entered for 31 cities (we are leaving out Idaho Falls) on each of several variables. The file NewestCitiesDatabase contains all of the variables, including Stanford data on searches and frisks, which we only have for some cities.
+
+```{r setup, message=FALSE,  warning=FALSE}
+library(tidyverse)
+library(mosaic)
+## Load the data
+NewCities <- read.csv("~/JuniorPracticumGitHub/NewestCitiesDatabase.csv")
+```
+
+Look at the structure of the datafile.
+```{r}
+str(NewCities)
+```
+
+```{r}
+favstats(~StanfordStopsBl, data=NewCities)
+favstats(~StanSearchBl, data=NewCities)
+favstats(~StanFriskBl, data=NewCities)
+```
+
+
+Note that we can create a new variable, and then get some stats on it, as follows:
+```{r}
+NewCities <- NewCities %>% mutate(ProbSearchIfStopBl = StanSearchBl/StanfordStopsBl)
+favstats(~ProbSearchIfStopBl, data=NewCities)
+```
+
+
+```{r}
+NewCities <- NewCities %>% mutate(ProbSearchIfStopWh = StanSearchWh/StanfordStopsWh)
+NewCities <- NewCities %>% mutate(ProbSearchIfStopRatio = ProbSearchIfStopBl/ProbSearchIfStopWh)
+NewCities <- NewCities %>% mutate(ProbSearchWh = StanSearchWh/WhitePop)
+NewCities <- NewCities %>% mutate(ProbSearchBl = StanSearchBl/BlackPop)
+NewCities <- NewCities %>% mutate(ProbSearchRatio = ProbSearchBl/ProbSearchWh)
+
+NewCities <- NewCities %>% mutate(ProbFriskWh = StanFriskWh/WhitePop)
+NewCities <- NewCities %>% mutate(ProbFriskBl = StanFriskBl/BlackPop)
+NewCities <- NewCities %>% mutate(ProbFriskIfStopBl = StanFriskBl/StanfordStopsBl)
+NewCities <- NewCities %>% mutate(ProbFriskIfStopWh = StanFriskWh/StanfordStopsWh)
+NewCities <- NewCities %>% mutate(ProbFriskIfStopRatio = ProbFriskIfStopBl/ProbFriskIfStopWh)
+NewCities <- NewCities %>% mutate(ProbFriskRatio = ProbFriskBl/ProbFriskWh)
+```
+
+Are Whites overrepresented in the police force?
+```{r}
+NewCities <- NewCities %>% mutate(WhitePoliceOver = WhitePoliceShare/WhitePopShare)
+favstats(~WhitePoliceOver, data=NewCities)
+NewCities[order(NewCities$WhitePoliceOver, decreasing = TRUE),]
+```
+
+
+Consider aggregating over years, replacing many observations by their mean.
+```{r}
+NewCitiesAgg <- NewCities %>% group_by(City) %>% summarise(RatioBlackWhite = mean(RatioBlackWhite, na.rm = TRUE))
+names(NewCitiesAgg)
+head(NewCitiesAgg)
+```
+
+There is a way to do this across several columns/variables at once:
+```{r}
+NewCitiesAggregated <- NewCities %>% group_by(City) %>% summarise_if(is.numeric, mean, na.rm = TRUE)
+#names(NewCitiesAggregated)
+dim(NewCitiesAggregated)
+head(NewCitiesAggregated)
+```
+
+
+
+
+
