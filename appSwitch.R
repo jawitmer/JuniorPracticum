@@ -51,7 +51,7 @@ server <- function(input, output) {
             switch(
                 input$transform,
                 identity = function(x) {x},
-                log = function(x) {log(1 + x)},
+                log = function(x) {log(0.01 + x)},
                 sqrt = function(x) {sqrt(x)}
             )
         df %>%
